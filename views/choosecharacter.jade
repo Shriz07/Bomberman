@@ -1,0 +1,13 @@
+extends layout
+
+block content
+  h1= title
+  p Welcome user #{userName}
+  p Choose character
+  form(method='POST' action='/chooseCharacter')
+    input(type='hidden' name='userName' value='#{userName}')
+    select#characterselect(name='character')
+        each character in classes 
+            option(value=character.class_id) #{character.class_name}
+    br
+    input(type='submit' value='Apply')
