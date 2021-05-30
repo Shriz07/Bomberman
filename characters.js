@@ -1,11 +1,11 @@
 const characters = [
-    {
+      {
         "class_id": "1",
         "class_name": "Zwinne nogi",
         "speed": 2,
         "bomb_amount": 1,
         "bomb_range": 1,
-        "live": 3,
+        "lifes": 3,
         "description": "Zwiększa szybkość postaci o 1",
       },
       {
@@ -14,7 +14,7 @@ const characters = [
         "speed": 1,
         "bomb_amount": 2,
         "bomb_range": 1,
-        "live": 3,
+        "lifes": 3,
         "description": "Zwiększa liczbę bomb o 1",
       },
       {
@@ -23,7 +23,7 @@ const characters = [
         "speed": 1,
         "bomb_amount": 1,
         "bomb_range": 1,
-        "live": 4,
+        "lifes": 4,
         "description": "Zwiększa liczbę żyć o 1",
       },
       {
@@ -32,7 +32,7 @@ const characters = [
         "speed": 1,
         "bomb_amount": 1,
         "bomb_range": 2,
-        "live": 3,
+        "lifes": 3,
         "description": "Zwiększa zasięg bomb o 1",
       }
 ]
