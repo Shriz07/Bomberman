@@ -1,31 +1,41 @@
 let users = [];
 
-function addUser(socketID, userName, classID, className, speed, bomb_amount, bomb_range, lifes)
+function addUser(userName)
 {
     const user = {
-        socketID: socketID,
         userName: userName,
-        classID: classID,
-        className: className,
-        speed: speed,
-        bomb_amount: bomb_amount,
-        bomb_range: bomb_range,
-        lifes: lifes
+        classID: null,
+        className: null,
+        speed: null,
+        bomb_amount: null,
+        bomb_range: null,
+        lifes: null
     }
     users.push(user);
     return user;
 }
 
-function findUser(socketID) {
-    const user = users.find(u => u.socketID === socketID);
+function findUser(userName) {
+    const user = users.find(u => u.userName === userName);
     return user;
 }
 
-function removeUser(socketID) {
-    const ID = users => users.socketID === socketID;
+function removeUser(userName) {
+    const ID = users => users.userName === userName;
     const index = users.findIndex(ID);
     if(index !== -1)
         return users.splice(index, 1)[0];
 }
 
-module.exports = {addUser, removeUser, findUser}
+function setClass(userName, classID, className, speed, bomb_amount, bomb_range, lifes)
+{
+    const user = findUser(userName);
+    user.classID = classID;
+    user.className = className;
+    user.speed = speed;
+    user.bomb_amount = bomb_amount;
+    user.bomb_range = bomb_range;
+    user.lifes = lifes;
+}
+
+module.exports = {addUser, removeUser, findUser, setClass}
