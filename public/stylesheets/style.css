@@ -6,3 +6,75 @@ body {
 a {
   color: #00B7FF;
 }
+
+p {
+  text-align: center;
+}
+
+.container {
+  margin: 0 auto;
+  text-align: center;
+}
+
+.display {
+  text-align: center;
+  font-size: 30px;
+  font-weight: lighter;
+  color: orangered;
+}
+
+.loginForm {
+  text-align: center;
+}
+
+.loginForm input[type="text"], select {
+  width: 30%;
+  margin: 8px 0;
+  padding: 6px 12px;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.loginForm input[type="submit"] {
+  background-color: orange;
+  color: white;
+  padding: 14px 20px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: 0.5s;
+}
+
+.loginForm input[type="submit"]:hover {
+  background-color: orangered;
+  transform: scale(1.1);
+}
+
+.characterForm select {
+  width: 30%;
+  margin: 8px 0;
+  padding: 6px 12px;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.characterForm input[type="submit"] {
+  background-color: orange;
+  color: white;
+  padding: 14px 20px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: 0.5s;
+}
+
+.characterForm input[type="submit"]:hover {
+  background-color: orangered;
+  transform: scale(1.1);
+}

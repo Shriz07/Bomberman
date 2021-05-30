@@ -1,11 +1,9 @@
 extends layout
 
 block content
-  h1= title
-  p Welcome to #{title}
-  form(method='POST' action='/login')
-      label(for='username') Username:
-      br
-      input#username(type='text' name='username')
-      br
-      input(type='submit' value='Enter game')
+  div(class="container")
+    h1(class='display') Choose your username to play the game.
+    form(class='loginForm' method='POST' action='/login')
+        input#username(type='text' name='username' placeholder='Your name...')
+        br
+        input(type='submit' value='Enter game')
