@@ -10,7 +10,11 @@ function addUser(UID)
         bomb_amount: null,
         bomb_range: null,
         lifes: null,
-        color: null
+        color: null,
+        player_xy: {
+            x: 1,
+            y: 1
+        }
     }
     users.push(user);
     return user;
@@ -39,9 +43,22 @@ function setClass(UID, classID, className, speed, bomb_amount, bomb_range, lifes
     user.lifes = lifes;
 }
 
-function setColor(color)
+function setColor(UID, color)
 {
+    const user = findUser(UID);
     user.color = color;
 }
 
-module.exports = {addUser, removeUser, findUser, setClass, setColor}
+function setPlayerPosition(UID, x, y)
+{
+    const user = findUser(UID);
+    user.player_xy.x = x;
+    user.player_xy.y = y;
+}
+
+function getUsers()
+{
+    return users;
+}
+
+module.exports = {addUser, removeUser, findUser, setClass, setColor, setPlayerPosition, getUsers}
