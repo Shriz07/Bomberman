@@ -10,12 +10,12 @@ router.get("/", function (req, res, next) {
 });
 
 router.post("/login", function(req, res, next) {
-    console.log(req.body.username);
-    const user = findUser(req.body.username);
+    console.log(req.body.UID);
+    const user = findUser(req.body.UID);
     if(user === undefined)
     {
-        let newUser = addUser(req.body.username);
-        res.render("choosecharacter", { status: "0", classes: characters, userName: newUser.userName });
+        let newUser = addUser(req.body.UID);
+        res.render("choosecharacter", { status: "0", classes: characters, UID: newUser.UID });
     }
     else
     {
@@ -25,19 +25,19 @@ router.post("/login", function(req, res, next) {
 });
 
 router.post("/chooseCharacter", function(req, res, next) {
-    console.log(req.body.userName);
+    console.log(req.body.UID);
     console.log(characters[parseInt(req.body.character) - 1].class_name);
     const character = characters[parseInt(req.body.character) - 1];
     const characterTaken = checkIfClassIsAlreadyTaken(character.class_id);
 
-    const user = findUser(req.body.userName);
+    const user = findUser(req.body.UID);
     if(user === undefined)
         res.render("index", { title: "Express" });
     else if(characterTaken === true)
-        res.render("choosecharacter", { status: "1", classes: characters, userName: user.userName });
+        res.render("choosecharacter", { status: "1", classes: characters, UID: user.UID });
     else
     {
-        setClass(user.userName, character.class_id, character.class_name, character.speed, character.bomb_amount, character.bomb_range, character.lifes);
+        setClass(user.UID, character.class_id, character.class_name, character.speed, character.bomb_amount, character.bomb_range, character.lifes);
         res.render("game", { user: user});
     }
 })

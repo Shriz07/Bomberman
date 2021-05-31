@@ -2,12 +2,12 @@ extends layout
 
 block content
   div(class='container')
-    h1(class='display') Welcome user #{userName}
+    h1(class='display') Welcome user #{UID}
     p Choose your class!
     if status == true
       p Class already taken !
     form(class='characterForm' method='POST' action='/chooseCharacter')
-      input(type='hidden' name='userName' value='#{userName}')
+      input(type='hidden' name='UID' value='#{UID}')
       select#characterselect(name='character')
           each character in classes 
               option(value=character.class_id) #{character.class_name}

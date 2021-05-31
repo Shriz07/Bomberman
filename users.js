@@ -1,9 +1,9 @@
 let users = [];
 
-function addUser(userName)
+function addUser(UID)
 {
     const user = {
-        userName: userName,
+        UID: UID,
         classID: null,
         className: null,
         speed: null,
@@ -15,21 +15,21 @@ function addUser(userName)
     return user;
 }
 
-function findUser(userName) {
-    const user = users.find(u => u.userName === userName);
+function findUser(UID) {
+    const user = users.find(u => u.UID === UID);
     return user;
 }
 
-function removeUser(userName) {
-    const ID = users => users.userName === userName;
+function removeUser(UID) {
+    const ID = users => users.UID === UID;
     const index = users.findIndex(ID);
     if(index !== -1)
         return users.splice(index, 1)[0];
 }
 
-function setClass(userName, classID, className, speed, bomb_amount, bomb_range, lifes)
+function setClass(UID, classID, className, speed, bomb_amount, bomb_range, lifes)
 {
-    const user = findUser(userName);
+    const user = findUser(UID);
     user.classID = classID;
     user.className = className;
     user.speed = speed;
