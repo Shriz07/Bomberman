@@ -4,8 +4,6 @@ block content
   div(class='container', id="container")
     h1(class='display') Welcome user #{UID}
     p Choose your class!
-    if status == true
-      p Class already taken !
     select#characterSelect(name='character')
         each character in classes 
             option(value=character.class_id) #{character.class_name}

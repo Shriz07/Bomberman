@@ -3,8 +3,24 @@ const sockethandler = {
     io: io
 };
 
-const {addUser, removeUser, findUser, setClass, checkIfClassIsAlreadyTaken} = require('./users.js');
+const {addUser, removeUser, findUser, setClass} = require('./users.js');
 const {characters} = require('./characters.js');
+
+const map = [
+    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+    [1,0,1,0,1,0,1,0,1,0,1,0,1,0,1],
+    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+    [1,0,1,0,1,0,1,0,1,0,1,0,1,0,1],
+    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+    [1,0,1,0,1,0,1,0,1,0,1,0,1,0,1],
+    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+    [1,0,1,0,1,0,1,0,1,0,1,0,1,0,1],
+    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+    [1,0,1,0,1,0,1,0,1,0,1,0,1,0,1],
+    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+]
 
 
 io.on( "connection", function( socket ) {
@@ -15,15 +31,10 @@ io.on( "connection", function( socket ) {
         console.log(characters[parseInt(data.class_id) - 1].class_name);
 
         const character = characters[parseInt(data.class_id) - 1];
-        const characterTaken = checkIfClassIsAlreadyTaken(character.class_id);
         const user = findUser(data.UID);
-        if(characterTaken === true)
-            socket.emit('class already taken', {});
-        else
-        {
-            setClass(user.UID, character.class_id, character.class_name, character.speed, character.bomb_amount, character.bomb_range, character.lifes);
-            socket.emit('loggedIn', {user: user})
-        }
+
+        setClass(user.UID, character.class_id, character.class_name, character.speed, character.bomb_amount, character.bomb_range, character.lifes);
+        socket.emit('loggedIn', {user: user, map: map})
     });
 });
 

@@ -9,7 +9,8 @@ function addUser(UID)
         speed: null,
         bomb_amount: null,
         bomb_range: null,
-        lifes: null
+        lifes: null,
+        color: null
     }
     users.push(user);
     return user;
@@ -38,14 +39,9 @@ function setClass(UID, classID, className, speed, bomb_amount, bomb_range, lifes
     user.lifes = lifes;
 }
 
-function checkIfClassIsAlreadyTaken(classID)
+function setColor(color)
 {
-    for(var user of users)
-    {
-        if(user.classID === classID)
-            return true;
-    }
-    return false;
+    user.color = color;
 }
 
-module.exports = {addUser, removeUser, findUser, setClass, checkIfClassIsAlreadyTaken}
+module.exports = {addUser, removeUser, findUser, setClass, setColor}

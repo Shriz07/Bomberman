@@ -1,7 +1,7 @@
 var express = require("express");
 var router = express.Router();
 
-const {addUser, removeUser, findUser, setClass, checkIfClassIsAlreadyTaken} = require('../users.js');
+const {addUser, removeUser, findUser, setClass} = require('../users.js');
 const {characters} = require('../characters.js');
 
 /* GET home page. */
@@ -31,13 +31,10 @@ router.post("/chooseCharacter", function(req, res, next) {
     console.log(req.body.UID);
     console.log(characters[parseInt(req.body.character) - 1].class_name);
     const character = characters[parseInt(req.body.character) - 1];
-    const characterTaken = checkIfClassIsAlreadyTaken(character.class_id);
 
     const user = findUser(req.body.UID);
     if(user === undefined)
         res.render("index", { title: "Express" });
-    else if(characterTaken === true)
-        res.render("choosecharacter", { status: "1", classes: characters, UID: user.UID });
     else
     {
         setClass(user.UID, character.class_id, character.class_name, character.speed, character.bomb_amount, character.bomb_range, character.lifes);
