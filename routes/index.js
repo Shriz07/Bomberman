@@ -25,6 +25,9 @@ router.post("/login", function(req, res, next) {
 });
 
 router.post("/chooseCharacter", function(req, res, next) {
+
+    //Do wywalenia chyba
+
     console.log(req.body.UID);
     console.log(characters[parseInt(req.body.character) - 1].class_name);
     const character = characters[parseInt(req.body.character) - 1];
