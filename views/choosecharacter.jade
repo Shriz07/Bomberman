@@ -4,6 +4,8 @@ block content
   div(class='container')
     h1(class='display') Welcome user #{userName}
     p Choose your class!
+    if status == true
+      p Class already taken !
     form(class='characterForm' method='POST' action='/chooseCharacter')
       input(type='hidden' name='userName' value='#{userName}')
       select#characterselect(name='character')
