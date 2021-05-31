@@ -38,4 +38,14 @@ function setClass(userName, classID, className, speed, bomb_amount, bomb_range, 
     user.lifes = lifes;
 }
 
-module.exports = {addUser, removeUser, findUser, setClass}
+function checkIfClassIsAlreadyTaken(classID)
+{
+    for(var user of users)
+    {
+        if(user.classID === classID)
+            return true;
+    }
+    return false;
+}
+
+module.exports = {addUser, removeUser, findUser, setClass, checkIfClassIsAlreadyTaken}
