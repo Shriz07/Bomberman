@@ -6,24 +6,57 @@ const sockethandler = {
 const {addUser, removeUser, findUser, setClass, getUsers} = require('./users.js');
 const {characters} = require('./characters.js');
 
+let clientNO = 0;
+
 const map = [
     [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+    [1,0,0,0,0,0,0,0,0,0,1,0,0,0,1],
     [1,0,1,0,1,0,1,0,1,0,1,0,1,0,1],
     [1,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
     [1,0,1,0,1,0,1,0,1,0,1,0,1,0,1],
-    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+    [1,0,0,0,0,0,0,0,0,1,1,1,0,0,1],
+    [1,0,1,0,1,0,1,0,1,0,1,0,1,0,1],
+    [1,0,0,0,1,0,0,0,0,0,0,0,0,0,1],
+    [1,0,1,0,1,0,1,0,1,0,1,0,1,0,1],
+    [1,0,0,0,0,0,1,0,0,0,0,0,0,0,1],
     [1,0,1,0,1,0,1,0,1,0,1,0,1,0,1],
     [1,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
     [1,0,1,0,1,0,1,0,1,0,1,0,1,0,1],
-    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-    [1,0,1,0,1,0,1,0,1,0,1,0,1,0,1],
-    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+    [1,0,1,0,0,0,0,0,0,0,0,0,0,0,1],
     [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
 ]
 
+//In the future change to some more advanced stuff
+function givePlayerPosition(user)
+{
+    if(clientNO === 0)
+    {
+        user.player_xy.x = 1;
+        user.player_xy.y = 1;
+        user.color = 'green';
+    }
+    else if(clientNO === 1)
+    {
+        user.player_xy.x = 13;
+        user.player_xy.y = 1;
+        user.color = 'red';
+    }
+    else if(clientNO === 2)
+    {
+        user.player_xy.x = 1;
+        user.player_xy.y = 13;
+        user.color = 'yellow';
+    }
+    else if(clientNO === 3)
+    {
+        user.player_xy.x = 13;
+        user.player_xy.y = 13;
+        user.color = 'blue';
+    }
+    clientNO += 1;
+}
 
-io.on( "connection", function( socket ) {
+io.on("connection", function( socket ) {
     console.log( "User connected" );
     var user = null;
     
@@ -35,18 +68,20 @@ io.on( "connection", function( socket ) {
         user = findUser(data.UID);
         
         setClass(user.UID, character.class_id, character.class_name, character.speed, character.bomb_amount, character.bomb_range, character.lifes);
-        socket.emit('loggedIn', {user: user, map: map})
+        givePlayerPosition(user);
+        socket.emit('loggedIn', {user: user, map: map});
+        io.emit('update player statistics', {users: getUsers()});
     });
 
     //Player wants to move
     socket.on("request move", function(data) {
-        //Check if player can move
-        let canMove = true;
-        if(canMove)
+        canMove = checkIfPlayerCanMove(user, data.direction);
+        console.log(canMove);
+        if(canMove === true)
         {
             io.emit("move player", {UID: user.UID, player_xy: user.player_xy})
             //Check if there is a bonus where player wants to move
-            let bonus = true;
+            let bonus = false;
             if(bonus)
             {
                 //Player has taken bonus
@@ -62,16 +97,40 @@ io.on( "connection", function( socket ) {
 
     //Player wants to place a bomb
     socket.on("request place bomb", function(data) {
+        console.log('Recived place bomb request');
         //Check if player can place a bomb
         let canPlace = true;
         if(canPlace)
         {
             io.emit("place bomb", {bomb_xy: {
-                "x": 1,
-                "y": 1
+                "x": user.player_xy.x,
+                "y": user.player_xy.y
             }})
         }
     })
 });
+
+function checkIfPlayerCanMove(player, direction)
+{
+    let x = player.player_xy.x;
+    let y = player.player_xy.y
+
+    if(direction === 'up')
+        y -= 1;
+    else if(direction === 'back')
+        y += 1; 
+    else if(direction === 'left')
+        x -= 1;
+    else if(direction === 'right')
+        x += 1;
+
+    if(map[y][x] === 0)
+    {
+        player.player_xy.x = x;
+        player.player_xy.y = y;
+        return true;
+    }
+    return false;
+}
 
 module.exports = sockethandler;
