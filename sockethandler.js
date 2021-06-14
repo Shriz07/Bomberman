@@ -4,25 +4,26 @@ const sockethandler = {
 };
 
 const {addUser, removeUser, findUser, setClass, getUsers} = require('./users.js');
+const {addBomb, removeBomb, getBombs, decreaseTimeOfBombs} = require('./bombs.js');
 const {characters} = require('./characters.js');
 
 let clientNO = 0;
 
 const map = [
     [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-    [1,0,0,0,0,0,0,0,0,0,1,0,0,0,1],
+    [1,0,2,2,2,2,2,0,0,0,0,0,0,0,1],
+    [1,0,1,2,1,0,1,0,1,0,1,0,1,0,1],
+    [1,0,2,2,2,2,0,0,0,0,0,0,0,0,1],
     [1,0,1,0,1,0,1,0,1,0,1,0,1,0,1],
     [1,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
     [1,0,1,0,1,0,1,0,1,0,1,0,1,0,1],
-    [1,0,0,0,0,0,0,0,0,1,1,1,0,0,1],
-    [1,0,1,1,1,1,1,1,1,0,1,0,1,0,1],
-    [1,0,0,0,1,0,0,0,0,0,0,0,0,0,1],
+    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
     [1,0,1,0,1,0,1,0,1,0,1,0,1,0,1],
-    [1,0,0,0,0,0,1,0,0,0,0,0,0,0,1],
-    [1,0,1,0,1,0,1,0,1,1,1,1,1,1,1],
-    [1,0,0,0,0,0,0,0,0,0,0,0,1,0,1],
-    [1,0,1,0,1,0,1,0,1,0,1,0,1,1,1],
-    [1,0,1,0,0,0,0,0,0,0,0,0,0,0,1],
+    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+    [1,0,1,0,1,0,1,0,1,0,1,0,1,0,1],
+    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+    [1,0,1,0,1,0,1,0,1,0,1,0,1,0,1],
+    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
     [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
 ]
 
@@ -56,6 +57,50 @@ function givePlayerPosition(user)
     clientNO += 1;
 }
 
+function removeWalls(x, y, radius)
+{
+    let blocks = [];
+    if(map[y-1][x] === 2)
+    {
+        map[y-1][x] = 0;
+        blocks.push({x: x, y: y-1});
+    }
+    if(map[y+1][x] === 2)
+    {
+        map[y+1][x] = 0;
+        blocks.push({x: x, y: y+1});
+    }
+    if(map[y][x-1] === 2)
+    {
+        map[y][x-1] = 0;
+        blocks.push({x: x-1, y: y});
+    }
+    if(map[y][x+1] === 2)
+    {
+        map[y][x+1] = 0;
+        blocks.push({x: x+1, y:y});
+    }
+    return blocks;
+}
+
+//TODO detect if any player is in bomb radius
+setInterval(function() { 
+    let bombs = getBombs();
+    bombs.forEach(bomb => {
+        if(bomb.timer === 1)
+        {
+            io.emit('place explode', {bomb_xy: bomb, radius: bomb.radius});
+        }
+        if(bomb.timer <= 0)
+        {
+            const blocks = removeWalls(bomb.x, bomb.y, bomb.radius);
+            removeBomb(bomb.x, bomb.y);
+            io.emit('remove block', {blocks: blocks});
+        }
+    }); 
+    decreaseTimeOfBombs(1);
+}, 1000);
+
 io.on("connection", function( socket ) {
     console.log( "User connected" );
     var user = null;
@@ -76,7 +121,7 @@ io.on("connection", function( socket ) {
     //Player wants to move
     socket.on("request move", function(data) {
         canMove = checkIfPlayerCanMove(user, data.direction);
-        
+
         if(canMove === true)
         {
             io.emit("move player", {UID: user.UID, player_xy: user.player_xy})
@@ -102,6 +147,7 @@ io.on("connection", function( socket ) {
         let canPlace = true;
         if(canPlace)
         {
+            addBomb(user.player_xy.x, user.player_xy.y);
             io.emit("place bomb", {bomb_xy: {
                 "x": user.player_xy.x,
                 "y": user.player_xy.y

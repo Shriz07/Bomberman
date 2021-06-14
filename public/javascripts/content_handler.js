@@ -4,6 +4,10 @@ let map = null;
 
 let oldPosition = { x: 0, y: 0};
 
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
 window.addEventListener('keydown', e => {
     oldPosition.x = user.player_xy.x;
     oldPosition.y = user.player_xy.y;
@@ -35,13 +39,13 @@ window.addEventListener('keydown', e => {
 
 
 let lastRenderTime = 0;
-const GAME_SPEED = 3;
+let characterSpeed = 1;
 
 function main(currentTime)
 {
     window.requestAnimationFrame(main);
     const secondsSinceLastRender = (currentTime - lastRenderTime) / 1000;
-    if(secondsSinceLastRender < 1 / GAME_SPEED)
+    if(secondsSinceLastRender < 1 / characterSpeed)
         return;
 
     lastRenderTime = currentTime;
@@ -66,6 +70,8 @@ function drawMap()
                 placeEmptySpace(i, j);
             if(map[j][i] === 1)
                 placeWall(i, j);
+            if(map[j][i] === 2)
+            placeDestructibleWall(i, j);
         }
     }
 }
@@ -92,6 +98,17 @@ function placeWall(x, y)
     gameBoard.appendChild(wall);
 }
 
+function placeDestructibleWall(x, y)
+{
+    const gameBoard = document.getElementById('game-board');
+
+    const wall = document.createElement('div');
+    wall.style.gridColumnStart = x+1;
+    wall.style.gridRowStart = y+1;
+    wall.classList.add('destructibleWall');
+    gameBoard.appendChild(wall);
+}
+
 function placeBomb(x, y)
 {
     const gameBoard = document.getElementById('game-board');
@@ -108,15 +125,39 @@ function placePlayer(playerID, color, x, y)
     const gameBoard = document.getElementById('game-board');
 
     const player = document.createElement('div');
-    player.style = 'background-color: ' + color + '; border: .50vmin solid black;';
+    player.style = 'background-color: ' + color + '; border: .50vmin solid black; z-index: 100;';
     player.style.gridColumnStart = x+1;
     player.style.gridRowStart = y+1;
     player.classList.add(playerID);
     gameBoard.appendChild(player);
 }
 
+async function placeExplode(x, y)
+{
+    const gameBoard = document.getElementById('game-board');
+    const explode = document.createElement('div');
+    explode.style.gridColumnStart = x+1;
+    explode.style.gridRowStart = y+1;
+    explode.classList.add('explode');
+    gameBoard.appendChild(explode);
+
+    await sleep(1000);
+
+    gameBoard.removeChild(explode);
+}
+
+async function bombExplode(x, y, radius)
+{
+    placeExplode(x, y);
+    placeExplode(x+1, y);
+    placeExplode(x-1, y);
+    placeExplode(x, y+1);
+    placeExplode(x, y-1);
+}
+
 socket.on('loggedIn', function(data) {
     user = data.user;
+    characterSpeed = user.speed;
     console.log('Login success');
     document.getElementsByTagName('body')[0].style = 'padding: 0px; height: 100vh; width: 100vw; display: flex; justify-content: center; align-items: center; margin: 0; background-color: black;';
     $("#container").empty();
@@ -147,6 +188,16 @@ socket.on('move player', function(data) {
 });
 
 socket.on('place bomb', function(data) {
-    console.log('Place bomb');
     placeBomb(data.bomb_xy.x, data.bomb_xy.y);
+});
+
+socket.on('place explode', function(data) {
+    placeEmptySpace(data.bomb_xy.x, data.bomb_xy.y);
+    bombExplode(data.bomb_xy.x, data.bomb_xy.y, data.radius);
+});
+
+socket.on('remove block', function(data) {
+    data.blocks.forEach(block => {
+        placeEmptySpace(block.x, block.y);
+    });
 });
