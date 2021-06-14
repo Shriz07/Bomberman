@@ -97,8 +97,18 @@ p {
   background-color: rgb(71, 71, 71);
 }
 
+.destructibleWall {
+  background-color: rgb(83, 55, 55);
+}
+
 .bomb {
   background-color: black;
   border-radius: 50%;
   border: .25vmin solid grey;
+}
+
+.explode {
+  background-color: red;
+  border-radius: 50%;
+  border: .75vmin solid yellow;
 }
