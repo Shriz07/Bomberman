@@ -78,3 +78,27 @@ p {
   background-color: orangered;
   transform: scale(1.1);
 }
+
+#game-board {
+  background-color: #CCC;
+  width: 100vmin;
+  height: 100vmin;
+  display: grid;
+  grid-template-rows: repeat(15, 1fr);
+  grid-template-columns: repeat(15, 1fr);
+  border: 1px solid black;
+}
+
+.emptySpace {
+  background-color: #CCC;
+}
+
+.wall {
+  background-color: rgb(71, 71, 71);
+}
+
+.bomb {
+  background-color: black;
+  border-radius: 50%;
+  border: .25vmin solid grey;
+}
