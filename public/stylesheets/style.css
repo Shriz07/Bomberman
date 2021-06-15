@@ -75,7 +75,7 @@ p {
 }
 
 .characterForm input[type="submit"]:hover {
-  background-color: orangered;
+  background-color: rgb(221, 59, 0);
   transform: scale(1.1);
 }
 
@@ -87,6 +87,14 @@ p {
   grid-template-rows: repeat(15, 1fr);
   grid-template-columns: repeat(15, 1fr);
   border: 1px solid black;
+}
+
+#statistics {
+  background-color: orangered;
+  border: 10px solid white;
+  margin-left: 50px;
+  width: 30vmin;
+  height: 90vmin;
 }
 
 .emptySpace {
