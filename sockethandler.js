@@ -62,24 +62,34 @@ function givePlayerPosition(user)
 function removeWalls(x, y, radius)
 {
     let blocks = [];
+    let flagLeft = flagRight = flagUp = flagDown = true;
+    if(map[y-1][x] === 1) //down
+        flagDown = false;
+    if(map[y+1][x] === 1) //up
+        flagUp = false;
+    if(map[y][x-1] === 1) //left
+        flagLeft = false;
+    if(map[y][x+1] === 1) //right
+        flagRight = false; 
+
     for(let i = 1; i <= radius; i++)
-    {
-        if(y - i > 0 && map[y-i][x] === 2)
+    { 
+        if(y - i > 0 && map[y-i][x] === 2 && flagUp)
         {
             map[y-i][x] = 0;
             blocks.push({x: x, y: y-i});
         }
-        if(y + i < map.length && map[y+i][x] === 2)
+        if(y + i < map.length && map[y+i][x] === 2 && flagDown)
         {
             map[y+i][x] = 0;
             blocks.push({x: x, y: y+i});
         }
-        if(x - i > 0 && map[y][x-i] === 2)
+        if(x - i > 0 && map[y][x-i] === 2 && flagLeft)
         {
             map[y][x-i] = 0;
             blocks.push({x: x-i, y: y});
         }
-        if(x + i < map[0].length && map[y][x+i] === 2)
+        if(x + i < map[0].length && map[y][x+i] === 2 && flagRight)
         {
             map[y][x+i] = 0;
             blocks.push({x: x+i, y:y});
@@ -99,7 +109,7 @@ setInterval(function() {
             removeBomb(bomb.x, bomb.y);
             io.emit('remove block', {blocks: blocks});
 
-            let playersHit = getUsersInBombRadius(bomb.x, bomb.y, bomb.radius);
+            let playersHit = getUsersInBombRadius(bomb.x, bomb.y, bomb.radius, map);
             playersHit.forEach(player => {
                 if(player.lifes > 0)
                     io.emit('hit player', {UID: player.UID, status: 'immortal', immortal_time: 3000});
