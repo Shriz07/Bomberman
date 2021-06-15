@@ -57,27 +57,42 @@ function setPlayerPosition(UID, x, y)
     user.player_xy.y = y;
 }
 
-function getUsersInBombRadius(x, y, radius)
+//TODO Check if player is behind wall
+function getUsersInBombRadius(bombx, bomby, radius)
 {
     let playersHit = [];
 
     users.forEach(user => {
+        if(user.immortal)
+            return;
+
         let px = user.player_xy.x;
         let py = user.player_xy.y;
 
-        console.log(user.immortal);
-
-        if(px === x && (py === y || py === y-1 || py === y+1) && user.immortal === 0)
+        if(px === bombx && py === bomby)
         {
             user.lifes--;
             user.immortal = 3;
             playersHit.push(user);
+            return;
         }
-        else if(py === y && (px === x || px === x+1 || px === x-1) && user.immortal === 0)
+
+        for(let i = 1; i <= radius; i++)
         {
-            user.lifes--;
-            user.immortal = 3;
-            playersHit.push(user);
+            if(px === bombx && (py === bomby || py === bomby-i || py === bomby+i))
+            {
+                user.lifes--;
+                user.immortal = 3;
+                playersHit.push(user);
+                break;
+            }
+            else if(py === bomby && (px === bombx || px === bombx+i || px === bombx-i))
+            {
+                user.lifes--;
+                user.immortal = 3;
+                playersHit.push(user);
+                break;
+            }
         }
     });
     return playersHit;
