@@ -81,8 +81,8 @@ p {
 
 #game-board {
   background-color: #CCC;
-  width: 100vmin;
-  height: 100vmin;
+  width: 90vmin;
+  height: 90vmin;
   display: grid;
   grid-template-rows: repeat(15, 1fr);
   grid-template-columns: repeat(15, 1fr);
@@ -111,4 +111,5 @@ p {
   background-color: red;
   border-radius: 50%;
   border: .75vmin solid yellow;
+  z-index: 101;
 }
