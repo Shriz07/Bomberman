@@ -87,12 +87,9 @@ setInterval(function() {
     let bombs = getBombs();
     bombs.forEach(bomb => {
         decreasePlayerImmortal();
-        if(bomb.timer === 1)
-        {
-            io.emit('place explode', {bomb_xy: bomb, radius: bomb.radius});
-        }
         if(bomb.timer <= 0)
         {
+            io.emit('place explode', {bomb_xy: bomb, radius: bomb.radius});
             const blocks = removeWalls(bomb.x, bomb.y, bomb.radius);
             removeBomb(bomb.x, bomb.y);
             io.emit('remove block', {blocks: blocks});
