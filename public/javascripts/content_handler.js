@@ -125,14 +125,14 @@ function placePlayer(playerID, color, x, y)
     const gameBoard = document.getElementById('game-board');
 
     const player = document.createElement('div');
-    player.style = 'background-color: ' + color + '; border: .50vmin solid black; z-index: 100;';
+    player.style = `background-image: url('../images/${color}.png'); z-index: 100; background-size: contain; background-repeat: no-repeat; background-position: center;`;
     player.style.gridColumnStart = x+1;
     player.style.gridRowStart = y+1;
     player.classList.add(playerID);
     gameBoard.appendChild(player);
 }
 
-async function placeExplode(x, y)
+async function placeExplosion(x, y)
 {
     const gameBoard = document.getElementById('game-board');
     const explode = document.createElement('div');
@@ -162,11 +162,19 @@ async function makePlayerImmortal(playerID, time)
 
 async function bombExplode(x, y, radius)
 {
-    placeExplode(x, y);
-    placeExplode(x+1, y);
-    placeExplode(x-1, y);
-    placeExplode(x, y+1);
-    placeExplode(x, y-1);
+    placeExplosion(x, y);
+
+    for(let i = 1; i <= radius; i++)
+    {
+        if(x - i > 0)
+            placeExplosion(x-i, y);
+        if(x + i < map[0].length)
+            placeExplosion(x+i, y);
+        if(y - i > 0)
+            placeExplosion(x, y-i);
+        if(y + i < map.length)
+            placeExplosion(x, y+i);
+    }
 }
 
 socket.on('loggedIn', function(data) {
@@ -177,13 +185,12 @@ socket.on('loggedIn', function(data) {
     $("#container").empty();
     $("#container").append("<div id='game-board'></div>");
 
-    const gameBoard = document.getElementById('game-board');
-
     map = data.map;
     drawMap();
 
     placePlayer(data.user.UID, data.user.color, data.user.player_xy.x, data.user.player_xy.y);
 });
+
 
 socket.on('update player statistics', function(data) {
     data.users.forEach(u => {
