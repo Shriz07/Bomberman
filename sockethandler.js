@@ -8,22 +8,23 @@ const {addBomb, removeBomb, getBombs, decreaseTimeOfBombs} = require('./bombs.js
 const {characters} = require('./characters.js');
 
 let clientNO = 0;
+let canPlace = true;
 
 const map = [
     [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-    [1,0,2,2,2,2,2,0,0,0,0,0,0,0,1],
-    [1,0,1,2,1,0,1,0,1,0,1,0,1,0,1],
-    [1,0,2,2,2,2,0,0,0,0,0,0,0,0,1],
-    [1,0,1,0,1,0,1,0,1,0,1,0,1,0,1],
-    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-    [1,0,1,0,1,0,1,0,1,0,1,0,1,0,1],
-    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-    [1,0,1,0,1,0,1,0,1,0,1,0,1,0,1],
-    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-    [1,0,1,0,1,0,1,0,1,0,1,0,1,0,1],
-    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-    [1,0,1,0,1,0,1,0,1,0,1,0,1,0,1],
-    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+    [1,0,0,0,2,2,2,2,2,2,2,0,0,0,1],
+    [1,0,1,0,1,2,1,2,1,2,1,0,1,0,1],
+    [1,0,0,0,2,2,2,2,2,2,2,0,0,0,1],
+    [1,2,1,2,1,2,1,2,1,2,1,2,1,2,1],
+    [1,2,2,2,2,2,2,2,2,2,2,2,2,2,1],
+    [1,2,1,2,1,2,1,2,1,2,1,2,1,2,1],
+    [1,2,2,2,2,2,2,2,2,2,2,2,2,2,1],
+    [1,2,1,2,1,2,1,2,1,2,1,2,1,2,1],
+    [1,2,2,2,2,2,2,2,2,2,2,2,2,2,1],
+    [1,2,1,2,1,2,1,2,1,2,1,2,1,2,1],
+    [1,0,0,0,2,2,2,2,2,2,2,0,0,0,1],
+    [1,0,1,0,1,2,1,2,1,2,1,0,1,0,1],
+    [1,0,0,0,2,2,2,2,2,2,2,0,0,0,1],
     [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
 ]
 
@@ -34,7 +35,7 @@ function givePlayerPosition(user)
     {
         user.player_xy.x = 1;
         user.player_xy.y = 1;
-        user.color = 'green';
+        user.color = 'blue';
     }
     else if(clientNO === 1)
     {
@@ -52,33 +53,37 @@ function givePlayerPosition(user)
     {
         user.player_xy.x = 13;
         user.player_xy.y = 13;
-        user.color = 'blue';
+        user.color = 'magenta';
     }
     clientNO += 1;
 }
 
+//TODO check if block is behind wall
 function removeWalls(x, y, radius)
 {
     let blocks = [];
-    if(map[y-1][x] === 2)
+    for(let i = 1; i <= radius; i++)
     {
-        map[y-1][x] = 0;
-        blocks.push({x: x, y: y-1});
-    }
-    if(map[y+1][x] === 2)
-    {
-        map[y+1][x] = 0;
-        blocks.push({x: x, y: y+1});
-    }
-    if(map[y][x-1] === 2)
-    {
-        map[y][x-1] = 0;
-        blocks.push({x: x-1, y: y});
-    }
-    if(map[y][x+1] === 2)
-    {
-        map[y][x+1] = 0;
-        blocks.push({x: x+1, y:y});
+        if(y - i > 0 && map[y-i][x] === 2)
+        {
+            map[y-i][x] = 0;
+            blocks.push({x: x, y: y-i});
+        }
+        if(y + i < map.length && map[y+i][x] === 2)
+        {
+            map[y+i][x] = 0;
+            blocks.push({x: x, y: y+i});
+        }
+        if(x - i > 0 && map[y][x-i] === 2)
+        {
+            map[y][x-i] = 0;
+            blocks.push({x: x-i, y: y});
+        }
+        if(x + i < map[0].length && map[y][x+i] === 2)
+        {
+            map[y][x+i] = 0;
+            blocks.push({x: x+i, y:y});
+        }
     }
     return blocks;
 }
@@ -104,7 +109,7 @@ setInterval(function() {
                     removeUser(player.UID);
                 }
             });
-        }
+        } 
     }); 
     decreaseTimeOfBombs(1);
 }, 1000);
@@ -150,16 +155,16 @@ io.on("connection", function( socket ) {
 
     //Player wants to place a bomb
     socket.on("request place bomb", function(data) {
-        console.log('Recived place bomb request');
-        //Check if player can place a bomb
-        let canPlace = true;
+        console.log(canPlace);
         if(canPlace)
         {
-            addBomb(user.player_xy.x, user.player_xy.y);
+            canPlace = false;
+            addBomb(user.player_xy.x, user.player_xy.y, user.bomb_range, 3);
             io.emit("place bomb", {bomb_xy: {
                 "x": user.player_xy.x,
                 "y": user.player_xy.y
             }})
+            setTimeout(() =>{canPlace = true}, 1000);
         }
     })
 
