@@ -164,15 +164,25 @@ async function bombExplode(x, y, radius)
 {
     placeExplosion(x, y);
 
+    let flagLeft = flagRight = flagUp = flagDown = true;
+    if(map[y-1][x] === 1) //down
+        flagDown = false;
+    if(map[y+1][x] === 1) //up
+        flagUp = false;
+    if(map[y][x-1] === 1) //left
+        flagLeft = false;
+    if(map[y][x+1] === 1) //right
+        flagRight = false; 
+
     for(let i = 1; i <= radius; i++)
     {
-        if(x - i > 0)
+        if(x - i > 0 && flagLeft)
             placeExplosion(x-i, y);
-        if(x + i < map[0].length)
+        if(x + i < map[0].length && flagRight)
             placeExplosion(x+i, y);
-        if(y - i > 0)
+        if(y - i > 0 && flagUp)
             placeExplosion(x, y-i);
-        if(y + i < map.length)
+        if(y + i < map.length && flagDown)
             placeExplosion(x, y+i);
     }
 }
