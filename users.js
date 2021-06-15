@@ -11,6 +11,7 @@ function addUser(UID)
         bomb_range: null,
         lifes: null,
         color: null,
+        immortal: 0,
         player_xy: {
             x: 1,
             y: 1
@@ -56,9 +57,43 @@ function setPlayerPosition(UID, x, y)
     user.player_xy.y = y;
 }
 
+function getUsersInBombRadius(x, y, radius)
+{
+    let playersHit = [];
+
+    users.forEach(user => {
+        let px = user.player_xy.x;
+        let py = user.player_xy.y;
+
+        console.log(user.immortal);
+
+        if(px === x && (py === y || py === y-1 || py === y+1) && user.immortal === 0)
+        {
+            user.lifes--;
+            user.immortal = 3;
+            playersHit.push(user);
+        }
+        else if(py === y && (px === x || px === x+1 || px === x-1) && user.immortal === 0)
+        {
+            user.lifes--;
+            user.immortal = 3;
+            playersHit.push(user);
+        }
+    });
+    return playersHit;
+}
+
+function decreasePlayerImmortal()
+{
+    users.forEach(user => {
+        if(user.immortal)
+            user.immortal--;
+    })
+}
+
 function getUsers()
 {
     return users;
 }
 
-module.exports = {addUser, removeUser, findUser, setClass, setColor, setPlayerPosition, getUsers}
+module.exports = {addUser, removeUser, findUser, setClass, setColor, setPlayerPosition, getUsers, getUsersInBombRadius, decreasePlayerImmortal}

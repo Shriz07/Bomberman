@@ -3,7 +3,7 @@ const sockethandler = {
     io: io
 };
 
-const {addUser, removeUser, findUser, setClass, getUsers} = require('./users.js');
+const {addUser, removeUser, findUser, setClass, getUsers, getUsersInBombRadius, decreasePlayerImmortal} = require('./users.js');
 const {addBomb, removeBomb, getBombs, decreaseTimeOfBombs} = require('./bombs.js');
 const {characters} = require('./characters.js');
 
@@ -83,10 +83,10 @@ function removeWalls(x, y, radius)
     return blocks;
 }
 
-//TODO detect if any player is in bomb radius
 setInterval(function() { 
     let bombs = getBombs();
     bombs.forEach(bomb => {
+        decreasePlayerImmortal();
         if(bomb.timer === 1)
         {
             io.emit('place explode', {bomb_xy: bomb, radius: bomb.radius});
@@ -96,6 +96,17 @@ setInterval(function() {
             const blocks = removeWalls(bomb.x, bomb.y, bomb.radius);
             removeBomb(bomb.x, bomb.y);
             io.emit('remove block', {blocks: blocks});
+
+            let playersHit = getUsersInBombRadius(bomb.x, bomb.y, bomb.radius);
+            playersHit.forEach(player => {
+                if(player.lifes > 0)
+                    io.emit('hit player', {UID: player.UID, status: 'immortal', immortal_time: 3000});
+                else
+                {
+                    io.emit('hit player', {UID: player.UID, status: 'dead', immortal_time: 0});
+                    removeUser(player.UID);
+                }
+            });
         }
     }); 
     decreaseTimeOfBombs(1);
@@ -153,6 +164,10 @@ io.on("connection", function( socket ) {
                 "y": user.player_xy.y
             }})
         }
+    })
+
+    socket.on('end', function(data) {
+        socket.disconnect(0);
     })
 });
 

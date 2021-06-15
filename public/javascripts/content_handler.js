@@ -146,6 +146,20 @@ async function placeExplode(x, y)
     gameBoard.removeChild(explode);
 }
 
+async function makePlayerImmortal(playerID, time)
+{
+    const gameBoard = document.getElementById('game-board');
+    const player = document.getElementsByClassName(playerID);
+    while(time > 0)
+    {
+        player[0].style.opacity = '0.5';
+        await sleep(250);
+        player[0].style.opacity = '1';
+        await sleep(250);
+        time -= 500;
+    }
+}
+
 async function bombExplode(x, y, radius)
 {
     placeExplode(x, y);
@@ -201,3 +215,20 @@ socket.on('remove block', function(data) {
         placeEmptySpace(block.x, block.y);
     });
 });
+
+socket.on('hit player', function(data) {
+    if(data.status === 'dead')
+    {
+        if(user.UID === data.UID)
+        {
+            alert('You are dead');
+            socket.emit('end', {});
+        }
+        $('.' + data.UID).remove();
+    }
+    else
+    {
+        console.log('Player should be immortal');
+        makePlayerImmortal(data.UID, data.immortal_time);
+    }
+})
