@@ -90,26 +90,27 @@ p {
 }
 
 .emptySpace {
-  background-color: #CCC;
+  background-image: url('../images/emptySpace.png');
+  background-size: contain;
 }
 
 .wall {
-  background-color: rgb(71, 71, 71);
+  background-image: url('../images/wall.png');
+  background-size: contain;
 }
 
 .destructibleWall {
-  background-color: rgb(83, 55, 55);
+  background-image: url('../images/destructibleWall.png');
+  background-size: contain;
 }
 
 .bomb {
-  background-color: black;
-  border-radius: 50%;
-  border: .25vmin solid grey;
+  background-image: url('../images/favicon.ico');
+  background-size: contain;
 }
 
 .explode {
-  background-color: red;
-  border-radius: 50%;
-  border: .75vmin solid yellow;
-  z-index: 101;
+  background-image: url('../images/explosion.jpg');
+  background-size: contain;
+  z-index: 99;
 }
