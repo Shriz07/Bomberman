@@ -28,7 +28,7 @@ function removeBomb(x, y)
 function decreaseTimeOfBombs(seconds)
 {
     bombs.forEach(bomb => {
-        bomb.timer--;
+        bomb.timer-=seconds;
     });
 }
 
