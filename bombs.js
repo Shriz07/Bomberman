@@ -1,12 +1,12 @@
 let bombs = [];
 
-function addBomb(x, y)
+function addBomb(x, y, radius, timer)
 {
     const bomb = {
         x: x,
         y: y,
-        radius: 1,
-        timer: 3
+        radius: radius,
+        timer: timer
     }
 
     bombs.push(bomb);
