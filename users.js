@@ -12,6 +12,7 @@ function addUser(UID)
         lifes: null,
         color: null,
         immortal: 0,
+        points: 0,
         player_xy: {
             x: 1,
             y: 1
