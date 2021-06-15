@@ -57,6 +57,13 @@ function setPlayerPosition(UID, x, y)
     user.player_xy.y = y;
 }
 
+function findWinner()
+{
+    if(users.length === 1)
+        return users[0];
+    return null;
+}
+
 //TODO Check if player is behind wall
 function getUsersInBombRadius(bombx, bomby, radius)
 {
@@ -111,4 +118,4 @@ function getUsers()
     return users;
 }
 
-module.exports = {addUser, removeUser, findUser, setClass, setColor, setPlayerPosition, getUsers, getUsersInBombRadius, decreasePlayerImmortal}
+module.exports = {addUser, removeUser, findUser, setClass, setColor, setPlayerPosition, getUsers, getUsersInBombRadius, decreasePlayerImmortal, findWinner}
