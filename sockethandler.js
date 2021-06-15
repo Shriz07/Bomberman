@@ -3,7 +3,7 @@ const sockethandler = {
     io: io
 };
 
-const {addUser, removeUser, findUser, setClass, getUsers, getUsersInBombRadius, decreasePlayerImmortal} = require('./users.js');
+const {addUser, removeUser, findUser, setClass, getUsers, getUsersInBombRadius, decreasePlayerImmortal, findWinner} = require('./users.js');
 const {addBomb, removeBomb, getBombs, decreaseTimeOfBombs} = require('./bombs.js');
 const {characters} = require('./characters.js');
 
@@ -107,6 +107,10 @@ setInterval(function() {
                 {
                     io.emit('hit player', {UID: player.UID, status: 'dead', immortal_time: 0});
                     removeUser(player.UID);
+                    const winner = findWinner();
+                    //TODO reset game
+                    if(winner !== null)
+                        io.emit('game over', {winner: winner.UID});
                 }
             });
         } 
@@ -155,7 +159,6 @@ io.on("connection", function( socket ) {
 
     //Player wants to place a bomb
     socket.on("request place bomb", function(data) {
-        console.log(canPlace);
         if(canPlace)
         {
             canPlace = false;
