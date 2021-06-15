@@ -2,16 +2,13 @@ var socket = io();
 let user = null;
 let map = null;
 let canMove = true;
-
-let oldPosition = { x: 0, y: 0};
+let allUsers = null;
 
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 
 window.addEventListener('keydown', e => {
-    oldPosition.x = user.player_xy.x;
-    oldPosition.y = user.player_xy.y;
     if(e.key === 'ArrowUp' && canMove)
     {
         let inputDirection = "up";
@@ -180,13 +177,47 @@ async function bombExplode(x, y, radius)
     }
 }
 
+function refreshUserStatistics()
+{
+    document.getElementById('statistics').innerHTML = '';
+    allUsers.forEach(u => {
+        const stats = document.createElement('div');
+        stats.style = 'border: 5px solid black;';
+        const playerName = document.createElement("H2");
+        const className = document.createElement("H3");
+        const lifes = document.createElement("H3");
+        const points = document.createElement("H3");
+        playerName.appendChild(document.createTextNode('Player name: ' + u.UID));
+        className.appendChild(document.createTextNode('Player class: ' + u.className));
+        lifes.appendChild(document.createTextNode('Lifes: ' + u.lifes));
+        points.appendChild(document.createTextNode('Points: ' + u.points));
+
+        stats.appendChild(playerName);
+        stats.appendChild(className);
+        stats.appendChild(lifes);
+        stats.appendChild(points);
+        
+        document.getElementById('statistics').appendChild(stats);
+    });
+}
+
+function decreasePlayerLifes(UID)
+{
+    allUsers.forEach(u => {
+        if(u.UID === UID)
+            u.lifes--;
+    });
+}
+
 socket.on('loggedIn', function(data) {
     user = data.user;
     characterSpeed = user.speed;
     console.log('Login success');
+    document.getElementsByClassName('container')[0].style.display = 'inherit';
     document.getElementsByTagName('body')[0].style = 'padding: 0px; height: 100vh; width: 100vw; display: flex; justify-content: center; align-items: center; margin: 0; background-color: black;';
     $("#container").empty();
     $("#container").append("<div id='game-board'></div>");
+    $("#container").append("<div id='statistics'></div>");
 
     map = data.map;
     drawMap();
@@ -196,12 +227,14 @@ socket.on('loggedIn', function(data) {
 
 
 socket.on('update player statistics', function(data) {
+    allUsers = data.users;
     data.users.forEach(u => {
         if(u.UID !== user.UID)
         {
             placePlayer(u.UID, u.color, u.player_xy.x, u.player_xy.y);
         }
     });
+    refreshUserStatistics();
 });
 
 socket.on('move player', function(data) {
@@ -234,10 +267,9 @@ socket.on('hit player', function(data) {
         $('.' + data.UID).remove();
     }
     else
-    {
-        console.log('Player should be immortal');
         makePlayerImmortal(data.UID, data.immortal_time);
-    }
+    decreasePlayerLifes(data.UID);
+    refreshUserStatistics();
 });
 
 socket.on('game over', function(data) {
