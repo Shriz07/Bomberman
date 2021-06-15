@@ -1,6 +1,7 @@
 var socket = io();
 let user = null;
 let map = null;
+let canMove = true;
 
 let oldPosition = { x: 0, y: 0};
 
@@ -11,30 +12,32 @@ function sleep(ms) {
 window.addEventListener('keydown', e => {
     oldPosition.x = user.player_xy.x;
     oldPosition.y = user.player_xy.y;
-    if(e.key === 'ArrowUp')
+    if(e.key === 'ArrowUp' && canMove)
     {
         let inputDirection = "up";
         socket.emit('request move', {direction: inputDirection});
+        canMove = false;
     }
-    else if(e.key === 'ArrowDown')
+    else if(e.key === 'ArrowDown' && canMove)
     {
         let inputDirection = "back";
         socket.emit('request move', {direction: inputDirection});
+        canMove = false;
     }
-    else if(e.key === 'ArrowLeft')
+    else if(e.key === 'ArrowLeft' && canMove)
     {
         let inputDirection = "left";
         socket.emit('request move', {direction: inputDirection});
+        canMove = false;
     }
-    else if(e.key === 'ArrowRight')
+    else if(e.key === 'ArrowRight' && canMove)
     {
         let inputDirection = "right";
         socket.emit('request move', {direction: inputDirection});
+        canMove = false;
     }
     else if(e.keyCode === 32)
-    {
         socket.emit('request place bomb', {});
-    }
 })
 
 
@@ -47,7 +50,7 @@ function main(currentTime)
     const secondsSinceLastRender = (currentTime - lastRenderTime) / 1000;
     if(secondsSinceLastRender < 1 / characterSpeed)
         return;
-
+    canMove = true;
     lastRenderTime = currentTime;
 }
 
@@ -227,10 +230,7 @@ socket.on('hit player', function(data) {
     if(data.status === 'dead')
     {
         if(user.UID === data.UID)
-        {
-            alert('You are dead');
             socket.emit('end', {});
-        }
         $('.' + data.UID).remove();
     }
     else
@@ -238,4 +238,8 @@ socket.on('hit player', function(data) {
         console.log('Player should be immortal');
         makePlayerImmortal(data.UID, data.immortal_time);
     }
+});
+
+socket.on('game over', function(data) {
+    alert(`Player ${data.winner} has won`);
 })
