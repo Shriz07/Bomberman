@@ -9,7 +9,7 @@ function addUser(UID)
         speed: null,
         bomb_amount: null,
         bomb_range: null,
-        lifes: null,
+        lives: null,
         color: null,
         immortal: 0,
         points: 0,
@@ -34,7 +34,7 @@ function removeUser(UID) {
         return users.splice(index, 1)[0];
 }
 
-function setClass(UID, classID, className, speed, bomb_amount, bomb_range, lifes)
+function setClass(UID, classID, className, speed, bomb_amount, bomb_range, lives)
 {
     const user = findUser(UID);
     user.classID = classID;
@@ -42,7 +42,7 @@ function setClass(UID, classID, className, speed, bomb_amount, bomb_range, lifes
     user.speed = speed;
     user.bomb_amount = bomb_amount;
     user.bomb_range = bomb_range;
-    user.lifes = lifes;
+    user.lives = lives;
 }
 
 function setColor(UID, color)
@@ -87,7 +87,7 @@ function getUsersInBombRadius(bombx, bomby, radius, map)
 
         if(px === bombx && py === bomby)
         {
-            user.lifes--;
+            user.lives--;
             user.immortal = 3;
             playersHit.push(user);
             return;
@@ -97,7 +97,7 @@ function getUsersInBombRadius(bombx, bomby, radius, map)
         {
             if((px === bombx && py === bomby - i && flagUp) || (px === bombx && py === bomby + i && flagDown) || (py === bomby && px === bombx - i && flagLeft) || (py === bomby && px === bombx + i && flagRight))
             {
-                user.lifes--;
+                user.lives--;
                 user.immortal = 3;
                 playersHit.push(user);
                 break;

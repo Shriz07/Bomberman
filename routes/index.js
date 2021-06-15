@@ -37,7 +37,7 @@ router.post("/chooseCharacter", function(req, res, next) {
         res.render("index", { title: "Express" });
     else
     {
-        setClass(user.UID, character.class_id, character.class_name, character.speed, character.bomb_amount, character.bomb_range, character.lifes);
+        setClass(user.UID, character.class_id, character.class_name, character.speed, character.bomb_amount, character.bomb_range, character.lives);
         res.render("game", { user: user});
     }
 })

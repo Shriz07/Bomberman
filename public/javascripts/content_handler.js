@@ -195,27 +195,27 @@ function refreshUserStatistics()
         stats.style = 'border: 5px solid black;';
         const playerName = document.createElement("H2");
         const className = document.createElement("H3");
-        const lifes = document.createElement("H3");
+        const lives = document.createElement("H3");
         const points = document.createElement("H3");
         playerName.appendChild(document.createTextNode('Player name: ' + u.UID));
         className.appendChild(document.createTextNode('Player class: ' + u.className));
-        lifes.appendChild(document.createTextNode('Lifes: ' + u.lifes));
+        lives.appendChild(document.createTextNode('Lives: ' + u.lives));
         points.appendChild(document.createTextNode('Points: ' + u.points));
 
         stats.appendChild(playerName);
         stats.appendChild(className);
-        stats.appendChild(lifes);
+        stats.appendChild(lives);
         stats.appendChild(points);
         
         document.getElementById('statistics').appendChild(stats);
     });
 }
 
-function decreasePlayerLifes(UID)
+function decreasePlayerLives(UID)
 {
     allUsers.forEach(u => {
         if(u.UID === UID)
-            u.lifes--;
+            u.lives--;
     });
 }
 
@@ -278,7 +278,7 @@ socket.on('hit player', function(data) {
     }
     else
         makePlayerImmortal(data.UID, data.immortal_time);
-    decreasePlayerLifes(data.UID);
+    decreasePlayerLives(data.UID);
     refreshUserStatistics();
 });
 

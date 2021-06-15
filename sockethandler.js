@@ -58,7 +58,6 @@ function givePlayerPosition(user)
     clientNO += 1;
 }
 
-//TODO check if block is behind wall
 function removeWalls(x, y, radius)
 {
     let blocks = [];
@@ -111,7 +110,7 @@ setInterval(function() {
 
             let playersHit = getUsersInBombRadius(bomb.x, bomb.y, bomb.radius, map);
             playersHit.forEach(player => {
-                if(player.lifes > 0)
+                if(player.lives > 0)
                     io.emit('hit player', {UID: player.UID, status: 'immortal', immortal_time: 3000});
                 else
                 {
@@ -139,7 +138,7 @@ io.on("connection", function( socket ) {
         const character = characters[parseInt(data.class_id) - 1];
         user = findUser(data.UID);
         
-        setClass(user.UID, character.class_id, character.class_name, character.speed, character.bomb_amount, character.bomb_range, character.lifes);
+        setClass(user.UID, character.class_id, character.class_name, character.speed, character.bomb_amount, character.bomb_range, character.lives);
         givePlayerPosition(user);
         socket.emit('loggedIn', {user: user, map: map});
         io.emit('update player statistics', {users: getUsers()});
