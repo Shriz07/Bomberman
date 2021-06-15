@@ -174,6 +174,11 @@ io.on("connection", function( socket ) {
     socket.on('end', function(data) {
         socket.disconnect(0);
     })
+
+    socket.on('disconnect', function(data) {
+        //removeUser(user.UID);
+        socket.disconnect(0);
+    })
 });
 
 function checkIfPlayerCanMove(player, direction)
