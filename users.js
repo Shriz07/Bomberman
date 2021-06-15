@@ -65,10 +65,18 @@ function findWinner()
     return null;
 }
 
-//TODO Check if player is behind wall
-function getUsersInBombRadius(bombx, bomby, radius)
+function getUsersInBombRadius(bombx, bomby, radius, map)
 {
     let playersHit = [];
+    let flagLeft = flagRight = flagUp = flagDown = true;
+    if(map[bomby-1][bombx] === 1) //down
+        flagDown = false;
+    if(map[bomby+1][bombx] === 1) //up
+        flagUp = false;
+    if(map[bomby][bombx-1] === 1) //left
+        flagLeft = false;
+    if(map[bomby][bombx+1] === 1) //right
+        flagRight = false; 
 
     users.forEach(user => {
         if(user.immortal)
@@ -87,14 +95,7 @@ function getUsersInBombRadius(bombx, bomby, radius)
 
         for(let i = 1; i <= radius; i++)
         {
-            if(px === bombx && (py === bomby || py === bomby-i || py === bomby+i))
-            {
-                user.lifes--;
-                user.immortal = 3;
-                playersHit.push(user);
-                break;
-            }
-            else if(py === bomby && (px === bombx || px === bombx+i || px === bombx-i))
+            if((px === bombx && py === bomby - i && flagUp) || (px === bombx && py === bomby + i && flagDown) || (py === bomby && px === bombx - i && flagLeft) || (py === bomby && px === bombx + i && flagRight))
             {
                 user.lifes--;
                 user.immortal = 3;
