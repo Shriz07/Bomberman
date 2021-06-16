@@ -3,15 +3,18 @@ const sockethandler = {
     io: io
 };
 
-const {addUser, removeUser, findUser, setClass, getUsers, getUsersInBombRadius, decreasePlayerImmortal, findWinner, addBonusToUser} = require('./users.js');
-const {addBomb, removeBomb, getBombs, decreaseTimeOfBombs} = require('./bombs.js');
-const {generateRandomBonuses, removeBonus, getBonuses, checkIfPlayerIsOnBonus} = require('./bonuses.js');
+const {addUser, removeUser, findUser, setClass, getUsers, getUsersInBombRadius, decreasePlayerImmortal, findWinner, addBonusToUser, countUsersAlive} = require('./users.js');
+const {addBomb, removeBomb, getBombs, decreaseTimeOfBombs, clearBombs} = require('./bombs.js');
+const {generateRandomBonuses, getBonuses, checkIfPlayerIsOnBonus, clearBonuses} = require('./bonuses.js');
+const {getMap} = require('./map.js');
 const {characters} = require('./characters.js');
 
 let clientNO = 0;
 let canPlace = true;
+let gameStarted = false;
+const MINIMUM_PLAYERS = 4; //For testing change it to 1 so that the game will immediately start
 
-const map = [
+let map = [
     [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
     [1,0,0,0,2,2,2,2,2,2,2,0,0,0,1],
     [1,0,1,0,1,2,1,2,1,2,1,0,1,0,1],
@@ -58,7 +61,39 @@ function givePlayerPosition(user)
         user.player_xy.y = 13;
         user.color = 'magenta';
     }
-    clientNO += 1;
+    clientNO++;
+}
+
+function checIfAllPlayersConnected()
+{
+    return clientNO === MINIMUM_PLAYERS ? true : false;
+}
+
+function resetMap()
+{
+    map = getMap();
+}
+
+function resetGame()
+{
+    resetMap();
+    clearBombs();
+    clearBonuses();
+    clientNO = 0;
+    const users = getUsers();
+    users.forEach(u => {
+        const character = characters[parseInt(u.classID) - 1];
+        setClass(u.UID, character);
+        givePlayerPosition(u);
+    });
+    if(checIfAllPlayersConnected())
+    {
+        io.emit('start game', {users: getUsers(), map: map});
+        const bonuses = getBonuses();
+        bonuses.forEach(bonus => {
+            io.emit('place bonus', {bonus_type: bonus.type, bonus_xy: bonus.bonus_xy});
+        });
+    }
 }
 
 function removeWalls(x, y, radius)
@@ -118,12 +153,20 @@ setInterval(function() {
                     io.emit('hit player', {UID: player.UID, status: 'immortal', immortal_time: 3000});
                 else
                 {
-                    io.emit('hit player', {UID: player.UID, status: 'dead', immortal_time: 0});
-                    removeUser(player.UID);
-                    const winner = findWinner();
-                    //TODO reset game
+                    io.emit('hit player', {UID: player.UID, status: 'dead'});
+                    
+                    let usersAlive = countUsersAlive();
+                    let winner = null;
+                    if(usersAlive === 1)
+                        winner = findWinner();
+                    else if(usersAlive <= 0)
+                        winner = 'No one';
+
                     if(winner !== null)
+                    {
                         io.emit('game over', {winner: winner.UID});
+                        resetGame();
+                    }
                 }
             });
         } 
@@ -132,7 +175,6 @@ setInterval(function() {
 }, 1000);
 
 io.on("connection", function( socket ) {
-    console.log( "User connected" );
     var user = null;
     
     socket.on("login", function(data){
@@ -142,21 +184,23 @@ io.on("connection", function( socket ) {
         const character = characters[parseInt(data.class_id) - 1];
         user = findUser(data.UID);
         
-        setClass(user.UID, character.class_id, character.class_name, character.speed, character.bomb_amount, character.bomb_range, character.lives);
+        setClass(user.UID, character);
         givePlayerPosition(user);
         socket.emit('loggedIn', {user: user, map: map});
-        io.emit('update player statistics', {users: getUsers()});
-
-        const bonuses = getBonuses();
-        bonuses.forEach(bonus => {
-            socket.emit('place bonus', {bonus_type: bonus.type, bonus_xy: bonus.bonus_xy});
-        });
+        
+        if(checIfAllPlayersConnected())
+        {
+            io.emit('start game', {users: getUsers(), map: map});
+            const bonuses = getBonuses();
+            bonuses.forEach(bonus => {
+                io.emit('place bonus', {bonus_type: bonus.type, bonus_xy: bonus.bonus_xy});
+            });
+        }
     });
 
     //Player wants to move
     socket.on("request move", function(data) {
         canMove = checkIfPlayerCanMove(user, data.direction);
-
         if(canMove === true)
         {
             io.emit("move player", {UID: user.UID, player_xy: user.player_xy})
@@ -186,13 +230,15 @@ io.on("connection", function( socket ) {
         }
     })
 
-    socket.on('end', function(data) {
-        socket.disconnect(0);
-    })
-
     socket.on('disconnect', function(data) {
-        //removeUser(user.UID);
-        socket.disconnect(0);
+        if(user != null)
+        {
+            io.emit('hit player', {UID: user.UID, status: 'dead'});
+            removeUser(user.UID);
+            clientNO--;
+            io.emit("update player statistics", {users: getUsers()});
+            socket.disconnect(0);
+        }
     })
 });
 
