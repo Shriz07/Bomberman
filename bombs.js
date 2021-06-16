@@ -37,4 +37,9 @@ function getBombs()
     return bombs;
 }
 
-module.exports = {addBomb, removeBomb, getBombs, decreaseTimeOfBombs}
+function clearBombs()
+{
+    bombs = [];
+}
+
+module.exports = {addBomb, removeBomb, getBombs, decreaseTimeOfBombs, clearBombs}
