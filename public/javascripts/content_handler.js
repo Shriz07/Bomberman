@@ -5,6 +5,8 @@ let canMove = false;
 let allUsers = null;
 let gameStarted = false;
 let isAlive = true;
+let lastRenderTime = 0;
+let characterSpeed = 1;
 
 function sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
@@ -29,9 +31,6 @@ window.addEventListener("keydown", (e) => {
     } else if (e.keyCode === 32 && gameStarted) socket.emit("request place bomb", {});
 });
 
-let lastRenderTime = 0;
-let characterSpeed = 1;
-
 function main(currentTime)
 {
     window.requestAnimationFrame(main);
@@ -49,8 +48,6 @@ function chooseCharacter() {
 }
 
 function drawMap() {
-    const gameBoard = document.getElementById("game-board");
-
     for (let i = 0; i < map[0].length; i++) {
         for (let j = 0; j < map.length; j++) {
             if (map[j][i] === 0) placeEmptySpace(i, j);
@@ -62,7 +59,6 @@ function drawMap() {
 
 function placeEmptySpace(x, y) {
     const gameBoard = document.getElementById("game-board");
-
     const emptySpace = document.createElement("div");
     emptySpace.style.gridColumnStart = x + 1;
     emptySpace.style.gridRowStart = y + 1;
@@ -72,7 +68,6 @@ function placeEmptySpace(x, y) {
 
 function placeWall(x, y) {
     const gameBoard = document.getElementById("game-board");
-
     const wall = document.createElement("div");
     wall.style.gridColumnStart = x + 1;
     wall.style.gridRowStart = y + 1;
@@ -93,14 +88,12 @@ function placeDestructibleWall(x, y) {
 
 function removeDestructibleWall(x, y) {
     const gameBoard = document.getElementById("game-board");
-
     const wall = document.getElementById('wall' + x + y);
     gameBoard.removeChild(wall);
 }
 
 function placeBomb(x, y) {
     const gameBoard = document.getElementById("game-board");
-
     const wall = document.createElement("div");
     wall.style.gridColumnStart = x + 1;
     wall.style.gridRowStart = y + 1;
@@ -110,7 +103,6 @@ function placeBomb(x, y) {
 
 function placePlayer(playerID, color, x, y) {
     const gameBoard = document.getElementById("game-board");
-
     const player = document.createElement("div");
     player.style = `background-image: url('../images/${color}.png'); z-index: 100; background-size: contain; background-repeat: no-repeat; background-position: center;`;
     player.style.gridColumnStart = x + 1;
@@ -122,7 +114,6 @@ function placePlayer(playerID, color, x, y) {
 function placeBonus(x, y, type)
 {
     const gameBoard = document.getElementById("game-board");
-
     const bonus = document.createElement("div");
     bonus.style = `background-image: url('../images/${type}.png'); z-index: 25; background-size: contain; background-repeat: no-repeat; background-position: center;`;
     bonus.style.gridColumnStart = x + 1;
@@ -152,7 +143,6 @@ async function placeExplosion(x, y) {
 }
 
 async function makePlayerImmortal(playerID, time) {
-    const gameBoard = document.getElementById("game-board");
     const player = document.getElementsByClassName(playerID);
     while (time > 0) {
         player[0].style.opacity = "0.5";

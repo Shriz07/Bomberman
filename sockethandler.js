@@ -33,7 +33,6 @@ let map = [
 
 generateRandomBonuses(10, map);
 
-//In the future change to some more advanced stuff
 function givePlayerPosition(user)
 {
     if(clientNO === 0)
