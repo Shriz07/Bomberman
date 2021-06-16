@@ -77,4 +77,9 @@ function generateRandomBonuses(quantity, map)
     }
 }
 
-module.exports = {addBonus, removeBonus, getBonuses, generateRandomBonuses, checkIfPlayerIsOnBonus}
+function clearBonuses()
+{
+    bonuses = [];
+}
+
+module.exports = {addBonus, removeBonus, getBonuses, generateRandomBonuses, checkIfPlayerIsOnBonus, clearBonuses}
