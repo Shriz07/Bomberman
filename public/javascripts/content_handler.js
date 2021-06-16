@@ -168,6 +168,9 @@ function refreshUserStatistics() {
     allUsers.forEach((u) => {
         const stats = document.createElement("div");
         stats.id = "playerStat";
+        const playerAvatar = document.createElement("img");
+        playerAvatar.src = `../images/${u.color}.png`;
+        playerAvatar.id = `playerAvatar`;
         const playerName = document.createElement("H2");
         const className = document.createElement("H3");
         const lives = document.createElement("H3");
@@ -185,7 +188,7 @@ function refreshUserStatistics() {
         stats.appendChild(className);
         stats.appendChild(lives);
         stats.appendChild(points);
-
+        stats.appendChild(playerAvatar);
         document.getElementById("statistics").appendChild(stats);
     });
 }
