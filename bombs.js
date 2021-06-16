@@ -3,8 +3,10 @@ let bombs = [];
 function addBomb(x, y, radius, timer)
 {
     const bomb = {
-        x: x,
-        y: y,
+        bomb_xy: {
+            x: x,
+            y: y
+        },
         radius: radius,
         timer: timer
     }
@@ -16,7 +18,7 @@ function removeBomb(x, y)
 {
     let i = 0;
     bombs.forEach(bomb => {
-        if(bomb.x === x && bomb.y === y)
+        if(bomb.bomb_xy.x === x && bomb.bomb_xy.y === y)
         {
             bombs.splice(i, 1);
             return;

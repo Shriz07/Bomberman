@@ -11,7 +11,7 @@ const {characters} = require('./characters.js');
 
 let clientNO = 0;
 let canPlace = true;
-const MAXIMUM_PLAYERS = 4; //For testing change it to 1 so that the game will immediately start
+const MAXIMUM_PLAYERS = 2; //For testing change it to 1 so that the game will immediately start
 
 let map = [
     [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
@@ -146,12 +146,12 @@ setInterval(function() {
         decreasePlayerImmortal();
         if(bomb.timer <= 0)
         {
-            io.emit('place explode', {bomb_xy: bomb, radius: bomb.radius});
-            const blocks = removeWalls(bomb.x, bomb.y, bomb.radius);
-            removeBomb(bomb.x, bomb.y);
+            io.emit('place explode', {bomb_xy: bomb.bomb_xy, radius: bomb.radius});
+            const blocks = removeWalls(bomb.bomb_xy.x, bomb.bomb_xy.y, bomb.radius);
+            removeBomb(bomb.bomb_xy.x, bomb.bomb_xy.y);
             io.emit('remove block', {blocks: blocks});
 
-            let playersHit = getUsersInBombRadius(bomb.x, bomb.y, bomb.radius, map);
+            let playersHit = getUsersInBombRadius(bomb.bomb_xy.x, bomb.bomb_xy.y, bomb.radius, map);
             playersHit.forEach(player => {
                 if(player.lives > 0)
                     io.emit('hit player', {UID: player.UID, status: 'immortal', immortal_time: 3000});
