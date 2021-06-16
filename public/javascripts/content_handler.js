@@ -234,7 +234,12 @@ function decreasePlayerLives(UID) {
     });
 }
 
-//TODO add some informationg about waiting for players
+function adjustGameBoardToMap()
+{
+    const gameBoard = document.getElementById("game-board");
+    gameBoard.style = `grid-template-rows: repeat(${map.length}, 1fr); grid-template-columns: repeat(${map[0].length}, 1fr);`;
+}
+
 socket.on("loggedIn", function (data) {
     user = data.user;
     characterSpeed = user.speed;
@@ -249,6 +254,7 @@ socket.on("loggedIn", function (data) {
     displayInformation("Waiting for other players...");
 
     map = data.map;
+    adjustGameBoardToMap();
     drawMap();
 
     placePlayer(
@@ -325,6 +331,7 @@ socket.on("start game", function (data) {
     $("#container").append("<div id='game-board'></div>");
     $("#container").append("<div id='statistics'></div>");
     map = data.map;
+    adjustGameBoardToMap();
     drawMap();
     isAlive = true;
     allUsers = data.users;
