@@ -11,7 +11,6 @@ const {characters} = require('./characters.js');
 
 let clientNO = 0;
 let canPlace = true;
-let gameStarted = false;
 const MAXIMUM_PLAYERS = 4; //For testing change it to 1 so that the game will immediately start
 
 let map = [
