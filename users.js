@@ -69,10 +69,10 @@ function getUsersInBombRadius(bombx, bomby, radius, map)
 {
     let playersHit = [];
     let flagLeft = flagRight = flagUp = flagDown = true;
-    if(map[bomby-1][bombx] === 1) //down
-        flagDown = false;
-    if(map[bomby+1][bombx] === 1) //up
+    if(map[bomby-1][bombx] === 1) //up
         flagUp = false;
+    if(map[bomby+1][bombx] === 1) //down
+        flagDown = false;
     if(map[bomby][bombx-1] === 1) //left
         flagLeft = false;
     if(map[bomby][bombx+1] === 1) //right
