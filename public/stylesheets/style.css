@@ -97,6 +97,7 @@ p {
   margin-left: 50px;
   width: 30vmin;
   height: 90vmin;
+  font-size: 1.45vh;
 }
 
 #playerStat {
@@ -105,8 +106,18 @@ p {
   margin-right: 15px;
 }
 
+#playerStat:last-child {
+  border-bottom: none;
+}
+
 #playerStat h2, h3 {
   font-weight: lighter !important;
+}
+
+#playerAvatar {
+  object-fit: contain;
+  width: 5vh;
+  height: 5vh;
 }
 
 .emptySpace {
