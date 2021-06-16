@@ -62,10 +62,10 @@ function removeWalls(x, y, radius)
 {
     let blocks = [];
     let flagLeft = flagRight = flagUp = flagDown = true;
-    if(map[y-1][x] === 1) //down
-        flagDown = false;
-    if(map[y+1][x] === 1) //up
+    if(map[y-1][x] === 1) //up
         flagUp = false;
+    if(map[y+1][x] === 1) //down
+        flagDOwn = false;
     if(map[y][x-1] === 1) //left
         flagLeft = false;
     if(map[y][x+1] === 1) //right
