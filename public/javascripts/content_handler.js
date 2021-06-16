@@ -79,12 +79,20 @@ function placeWall(x, y) {
 
 function placeDestructibleWall(x, y) {
     const gameBoard = document.getElementById("game-board");
-
     const wall = document.createElement("div");
+    wall.style = 'z-index: 50;';
     wall.style.gridColumnStart = x + 1;
     wall.style.gridRowStart = y + 1;
     wall.classList.add("destructibleWall");
+    wall.id = 'wall' + x + y;
     gameBoard.appendChild(wall);
+}
+
+function removeDestructibleWall(x, y) {
+    const gameBoard = document.getElementById("game-board");
+
+    const wall = document.getElementById('wall' + x + y);
+    gameBoard.removeChild(wall);
 }
 
 function placeBomb(x, y) {
@@ -106,6 +114,25 @@ function placePlayer(playerID, color, x, y) {
     player.style.gridRowStart = y + 1;
     player.classList.add(playerID);
     gameBoard.appendChild(player);
+}
+
+function placeBonus(x, y, type)
+{
+    const gameBoard = document.getElementById("game-board");
+
+    const bonus = document.createElement("div");
+    bonus.style = `background-image: url('../images/${type}.png'); z-index: 25; background-size: contain; background-repeat: no-repeat; background-position: center;`;
+    bonus.style.gridColumnStart = x + 1;
+    bonus.style.gridRowStart = y + 1;
+    bonus.id = 'bonus' + x + y;
+    gameBoard.appendChild(bonus);
+}
+
+function removeBonus(x, y)
+{
+    const gameBoard = document.getElementById("game-board");
+    const bonus = document.getElementById('bonus' + x + y);
+    gameBoard.removeChild(bonus);
 }
 
 async function placeExplosion(x, y) {
@@ -149,11 +176,6 @@ async function bombExplode(x, y, radius) {
     if (map[y][x + 1] === 1)
         //right
         flagRight = false;
-
-    /*console.log(map[y - 1][x]);
-    console.log(flagUp);
-    console.log(map[y + 1][x]);
-    console.log(flagDown);*/
 
     for (let i = 1; i <= radius; i++) {
         if (y - i > 0 && flagUp) placeExplosion(x, y - i);
@@ -221,6 +243,7 @@ socket.on("loggedIn", function (data) {
     );
 });
 
+//TODO Some changes have to be done when starting endpoint will be created
 socket.on("update player statistics", function (data) {
     allUsers = data.users;
     data.users.forEach((u) => {
@@ -250,6 +273,7 @@ socket.on("place explode", function (data) {
 socket.on("remove block", function (data) {
     data.blocks.forEach((block) => {
         placeEmptySpace(block.x, block.y);
+        removeDestructibleWall(block.x, block.y);
     });
 });
 
@@ -265,3 +289,11 @@ socket.on("hit player", function (data) {
 socket.on("game over", function (data) {
     alert(`Player ${data.winner} has won`);
 });
+
+socket.on("place bonus", function (data) {
+    placeBonus(data.bonus_xy.x, data.bonus_xy.y, data.bonus_type);
+});
+
+socket.on("remove bonus", function (data) {
+    removeBonus(data.bonus_xy.x, data.bonus_xy.y);
+})
