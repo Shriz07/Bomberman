@@ -3,8 +3,9 @@ const sockethandler = {
     io: io
 };
 
-const {addUser, removeUser, findUser, setClass, getUsers, getUsersInBombRadius, decreasePlayerImmortal, findWinner} = require('./users.js');
+const {addUser, removeUser, findUser, setClass, getUsers, getUsersInBombRadius, decreasePlayerImmortal, findWinner, addBonusToUser} = require('./users.js');
 const {addBomb, removeBomb, getBombs, decreaseTimeOfBombs} = require('./bombs.js');
+const {generateRandomBonuses, removeBonus, getBonuses, checkIfPlayerIsOnBonus} = require('./bonuses.js');
 const {characters} = require('./characters.js');
 
 let clientNO = 0;
@@ -27,6 +28,8 @@ const map = [
     [1,0,0,0,2,2,2,2,2,2,2,0,0,0,1],
     [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
 ]
+
+generateRandomBonuses(10, map);
 
 //In the future change to some more advanced stuff
 function givePlayerPosition(user)
@@ -65,11 +68,12 @@ function removeWalls(x, y, radius)
     if(map[y-1][x] === 1) //up
         flagUp = false;
     if(map[y+1][x] === 1) //down
-        flagDOwn = false;
+        flagDown = false;
     if(map[y][x-1] === 1) //left
         flagLeft = false;
     if(map[y][x+1] === 1) //right
         flagRight = false; 
+
 
     for(let i = 1; i <= radius; i++)
     { 
@@ -142,6 +146,11 @@ io.on("connection", function( socket ) {
         givePlayerPosition(user);
         socket.emit('loggedIn', {user: user, map: map});
         io.emit('update player statistics', {users: getUsers()});
+
+        const bonuses = getBonuses();
+        bonuses.forEach(bonus => {
+            socket.emit('place bonus', {bonus_type: bonus.type, bonus_xy: bonus.bonus_xy});
+        });
     });
 
     //Player wants to move
@@ -152,15 +161,12 @@ io.on("connection", function( socket ) {
         {
             io.emit("move player", {UID: user.UID, player_xy: user.player_xy})
             //Check if there is a bonus where player wants to move
-            let bonus = false;
-            if(bonus)
+            const bonus = checkIfPlayerIsOnBonus(user.player_xy.x, user.player_xy.y);
+            if(bonus !== null)
             {
+                addBonusToUser(user.UID, bonus.type);
                 //Player has taken bonus
-                io.emit("remove bonus", {bonus_xy: {
-                    "x": 1,
-                    "y": 1
-                }});
-
+                io.emit("remove bonus", {bonus_xy: bonus.bonus_xy});
                 io.emit("update player statistics", {users: getUsers()});
             }
         }
