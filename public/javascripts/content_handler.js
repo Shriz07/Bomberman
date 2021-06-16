@@ -250,6 +250,11 @@ socket.on("update player statistics", function (data) {
         if (u.UID !== user.UID) {
             placePlayer(u.UID, u.color, u.player_xy.x, u.player_xy.y);
         }
+        else if(u.UID === user.UID)
+        {
+            user.speed = u.speed;
+            characterSpeed = user.speed;
+        }
     });
     refreshUserStatistics();
 });
