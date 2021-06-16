@@ -45,6 +45,17 @@ function setClass(UID, classID, className, speed, bomb_amount, bomb_range, lives
     user.lives = lives;
 }
 
+function addBonusToUser(UID, bonus_type)
+{
+    const user = findUser(UID);
+    if(bonus_type === 'speed')
+        user.speed++;
+    else if(bonus_type === 'bomb_range')
+        user.bomb_range++;
+    else if(bonus_type === 'bomb_amount')
+        user.bomb_amount++;
+}
+
 function setColor(UID, color)
 {
     const user = findUser(UID);
@@ -120,4 +131,4 @@ function getUsers()
     return users;
 }
 
-module.exports = {addUser, removeUser, findUser, setClass, setColor, setPlayerPosition, getUsers, getUsersInBombRadius, decreasePlayerImmortal, findWinner}
+module.exports = {addUser, removeUser, findUser, setClass, setColor, setPlayerPosition, getUsers, getUsersInBombRadius, decreasePlayerImmortal, findWinner, addBonusToUser}
