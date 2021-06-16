@@ -247,6 +247,8 @@ io.on("connection", function( socket ) {
 
 function checkIfPlayerCanMove(player, direction)
 {
+    if(player.player_xy === null)
+        return false;
     let x = player.player_xy.x;
     let y = player.player_xy.y
 
