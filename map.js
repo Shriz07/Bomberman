@@ -16,6 +16,7 @@ const map = [
     [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
 ]
 
+
 function getMap()
 {
     return map;
