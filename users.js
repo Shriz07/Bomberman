@@ -31,18 +31,18 @@ function removeUser(UID) {
     const ID = users => users.UID === UID;
     const index = users.findIndex(ID);
     if(index !== -1)
-        return users.splice(index, 1)[0];
+        users.splice(index, 1)[0];
 }
 
-function setClass(UID, classID, className, speed, bomb_amount, bomb_range, lives)
+function setClass(UID, character)
 {
     const user = findUser(UID);
-    user.classID = classID;
-    user.className = className;
-    user.speed = speed;
-    user.bomb_amount = bomb_amount;
-    user.bomb_range = bomb_range;
-    user.lives = lives;
+    user.classID = character.class_id;
+    user.className = character.class_name;
+    user.speed = character.speed;
+    user.bomb_amount = character.bomb_amount;
+    user.bomb_range = character.bomb_range;
+    user.lives = character.lives;
 }
 
 function addBonusToUser(UID, bonus_type)
@@ -69,11 +69,23 @@ function setPlayerPosition(UID, x, y)
     user.player_xy.y = y;
 }
 
+function countUsersAlive()
+{
+    let count = 0;
+    for(let user of users)
+    {
+        if(user.lives)
+            count++;
+    }
+    return count
+}
 function findWinner()
 {
-    if(users.length === 1)
-        return users[0];
-    return null;
+    for(let user of users)
+    {
+        if(user.lives)
+            return user;
+    }
 }
 
 function getUsersInBombRadius(bombx, bomby, radius, map)
@@ -108,9 +120,12 @@ function getUsersInBombRadius(bombx, bomby, radius, map)
         {
             if((px === bombx && py === bomby - i && flagUp) || (px === bombx && py === bomby + i && flagDown) || (py === bomby && px === bombx - i && flagLeft) || (py === bomby && px === bombx + i && flagRight))
             {
-                user.lives--;
-                user.immortal = 3;
-                playersHit.push(user);
+                if(user.lives > 0)
+                {
+                    user.lives--;
+                    user.immortal = 3;
+                    playersHit.push(user);
+                }
                 break;
             }
         }
@@ -131,4 +146,4 @@ function getUsers()
     return users;
 }
 
-module.exports = {addUser, removeUser, findUser, setClass, setColor, setPlayerPosition, getUsers, getUsersInBombRadius, decreasePlayerImmortal, findWinner, addBonusToUser}
+module.exports = {addUser, removeUser, findUser, setClass, setColor, setPlayerPosition, getUsers, getUsersInBombRadius, decreasePlayerImmortal, findWinner, addBonusToUser, countUsersAlive}
