@@ -12,7 +12,7 @@ const {characters} = require('./characters.js');
 let clientNO = 0;
 let canPlace = true;
 let gameStarted = false;
-const MINIMUM_PLAYERS = 4; //For testing change it to 1 so that the game will immediately start
+const MAXIMUM_PLAYERS = 4; //For testing change it to 1 so that the game will immediately start
 
 let map = [
     [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
@@ -66,7 +66,12 @@ function givePlayerPosition(user)
 
 function checIfAllPlayersConnected()
 {
-    return clientNO === MINIMUM_PLAYERS ? true : false;
+    if(MAXIMUM_PLAYERS < 1 || MAXIMUM_PLAYERS > 4)
+    {
+        console.log('Maximum players should be between 1 and 4');
+        return false;
+    }
+    return clientNO === MAXIMUM_PLAYERS ? true : false;
 }
 
 function resetMap()
