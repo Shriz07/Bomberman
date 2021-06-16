@@ -49,7 +49,7 @@ function addBonusToUser(UID, bonus_type)
 {
     const user = findUser(UID);
     if(bonus_type === 'speed')
-        user.speed++;
+        user.speed += 2;
     else if(bonus_type === 'bomb_range')
         user.bomb_range++;
     else if(bonus_type === 'bomb_amount')
