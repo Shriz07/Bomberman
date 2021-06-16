@@ -1,41 +1,44 @@
 var socket = io();
 let user = null;
 let map = null;
-let canMove = true;
+let canMove = false;
 let allUsers = null;
+let gameStarted = false;
+let isAlive = true;
 
 function sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 window.addEventListener("keydown", (e) => {
-    if (e.key === "ArrowUp" && canMove) {
+    if (e.key === "ArrowUp" && canMove && isAlive) {
         let inputDirection = "up";
         socket.emit("request move", { direction: inputDirection });
-        canMove = false;
-    } else if (e.key === "ArrowDown" && canMove) {
+    } else if (e.key === "ArrowDown" && canMove && isAlive) {
         let inputDirection = "back";
         socket.emit("request move", { direction: inputDirection });
         canMove = false;
-    } else if (e.key === "ArrowLeft" && canMove) {
+    } else if (e.key === "ArrowLeft" && canMove && isAlive) {
         let inputDirection = "left";
         socket.emit("request move", { direction: inputDirection });
         canMove = false;
-    } else if (e.key === "ArrowRight" && canMove) {
+    } else if (e.key === "ArrowRight" && canMove && isAlive) {
         let inputDirection = "right";
         socket.emit("request move", { direction: inputDirection });
         canMove = false;
-    } else if (e.keyCode === 32) socket.emit("request place bomb", {});
+    } else if (e.keyCode === 32 && gameStarted) socket.emit("request place bomb", {});
 });
 
 let lastRenderTime = 0;
 let characterSpeed = 1;
 
-function main(currentTime) {
+function main(currentTime)
+{
     window.requestAnimationFrame(main);
     const secondsSinceLastRender = (currentTime - lastRenderTime) / 1000;
     if (secondsSinceLastRender < 1 / characterSpeed) return;
-    canMove = true;
+    if(gameStarted)
+        canMove = true;
     lastRenderTime = currentTime;
 }
 
@@ -215,12 +218,23 @@ function refreshUserStatistics() {
     });
 }
 
+function displayInformation(textToBeDisplayed) {
+    document.getElementById("statistics").innerHTML = "";
+    const info = document.createElement("div");
+    info.id = "info";
+    const text = document.createElement("H2");
+    text.appendChild(document.createTextNode(textToBeDisplayed));
+    info.appendChild(text);
+    document.getElementById("statistics").appendChild(info);
+}
+
 function decreasePlayerLives(UID) {
     allUsers.forEach((u) => {
         if (u.UID === UID) u.lives--;
     });
 }
 
+//TODO add some informationg about waiting for players
 socket.on("loggedIn", function (data) {
     user = data.user;
     characterSpeed = user.speed;
@@ -231,6 +245,8 @@ socket.on("loggedIn", function (data) {
     $("#container").empty();
     $("#container").append("<div id='game-board'></div>");
     $("#container").append("<div id='statistics'></div>");
+
+    displayInformation("Waiting for other players...");
 
     map = data.map;
     drawMap();
@@ -243,14 +259,11 @@ socket.on("loggedIn", function (data) {
     );
 });
 
-//TODO Some changes have to be done when starting endpoint will be created
+
 socket.on("update player statistics", function (data) {
     allUsers = data.users;
     data.users.forEach((u) => {
-        if (u.UID !== user.UID) {
-            placePlayer(u.UID, u.color, u.player_xy.x, u.player_xy.y);
-        }
-        else if(u.UID === user.UID)
+        if(u.UID === user.UID)
         {
             user.speed = u.speed;
             characterSpeed = user.speed;
@@ -284,7 +297,7 @@ socket.on("remove block", function (data) {
 
 socket.on("hit player", function (data) {
     if (data.status === "dead") {
-        if (user.UID === data.UID) socket.emit("end", {});
+        if (user.UID === data.UID) isAlive = false;
         $("." + data.UID).remove();
     } else makePlayerImmortal(data.UID, data.immortal_time);
     decreasePlayerLives(data.UID);
@@ -293,6 +306,8 @@ socket.on("hit player", function (data) {
 
 socket.on("game over", function (data) {
     alert(`Player ${data.winner} has won`);
+    gameStarted = false;
+    displayInformation("Waiting for other players...");
 });
 
 socket.on("place bonus", function (data) {
@@ -301,4 +316,22 @@ socket.on("place bonus", function (data) {
 
 socket.on("remove bonus", function (data) {
     removeBonus(data.bonus_xy.x, data.bonus_xy.y);
-})
+});
+
+
+socket.on("start game", function (data) {
+    console.log('Game started');
+    $("#container").empty();
+    $("#container").append("<div id='game-board'></div>");
+    $("#container").append("<div id='statistics'></div>");
+    map = data.map;
+    drawMap();
+    isAlive = true;
+    allUsers = data.users;
+    data.users.forEach((u) => {
+        placePlayer(u.UID, u.color, u.player_xy.x, u.player_xy.y);
+    });
+    refreshUserStatistics();
+
+    gameStarted = true;
+});
