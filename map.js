@@ -19,7 +19,7 @@ const map = [
 
 function getMap()
 {
-    return map;
+    return JSON.parse(JSON.stringify(map));
 }
 
 module.exports = {getMap}
