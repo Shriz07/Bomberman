@@ -84,7 +84,10 @@ function findWinner()
     for(let user of users)
     {
         if(user.lives)
+        {
+            user.points += 5;
             return user;
+        }
     }
 }
 
