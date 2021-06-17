@@ -167,6 +167,7 @@ setInterval(function() {
 
                     if(winner !== null)
                     {
+                        io.emit("update player statistics", {users: getUsers()});
                         io.emit('game over', {winner: winner.UID});
                         resetGame();
                     }
@@ -261,7 +262,23 @@ function checkIfPlayerCanMove(player, direction)
     else if(direction === 'right')
         x += 1;
 
+    let bombs = getBombs();
+    let bombOnWay = false;
+    let emptySpace = false;
+    
     if(map[y][x] === 0)
+        emptySpace = true;
+
+    for(let bomb of bombs)
+    {
+        if(bomb.bomb_xy.x === x && bomb.bomb_xy.y === y)
+        {
+            bombOnWay = true;
+            break;
+        }
+    }
+
+    if(emptySpace && !bombOnWay)
     {
         player.player_xy.x = x;
         player.player_xy.y = y;
